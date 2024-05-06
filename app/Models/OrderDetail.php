@@ -10,30 +10,6 @@ class OrderDetail extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'quantity',
-        'price',
-        'subtotal',
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'id' => 'integer',
-        'order_id' => 'integer',
-        'product_id' => 'integer',
-    ];
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
