@@ -18,6 +18,32 @@ class Order extends Model
         'payment_method' => PaymentMethod::class,
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (self $order) {
+            $order->user_id = auth()->id();
+            $order->total = 0;
+        });
+
+        static::saving(function ($order) {
+            if ($order->isDirty('total')) {
+                $order->loadMissing('orderDetails.product');
+
+                $profitCalculation = $order->orderDetails->reduce(function ($carry, $detail) {
+                    $productProfit = ($detail->price - $detail->product->cost_price) * $detail->quantity;
+                    return $carry + $productProfit;
+                }, 0);
+
+                $order->attributes['profit'] = $profitCalculation;
+            }
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'order_number';
+    }
+
     public function orderDetails(): HasMany
     {
         return $this->hasMany(OrderDetail::class);
