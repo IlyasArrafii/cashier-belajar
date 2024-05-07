@@ -58,4 +58,10 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function markAsComplete(): void
+    {
+        $this->status = \App\Enums\OrderStatus::COMPLETED;
+        $this->save();
+    }
 }
