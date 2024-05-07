@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Validation\Rules\Enum;
 
 class OrderResource extends Resource
 {
@@ -71,7 +74,8 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('order_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order_name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('discount')
                     ->numeric()
                     ->sortable(),
@@ -98,13 +102,14 @@ class OrderResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                //Hidden if status completed
+                Tables\Actions\EditAction::make()->hidden(fn (Order $order) => $order->status == OrderStatus::COMPLETED),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])->recordUrl(null);
     }
 
     public static function getRelations(): array

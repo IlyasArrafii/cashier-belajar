@@ -44,6 +44,8 @@ class AppPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->authMiddleware([Authenticate::class,])->sidebarCollapsibleOnDesktop();
+            ->authMiddleware([Authenticate::class,])
+            ->sidebarCollapsibleOnDesktop()
+            ->viteTheme('resources/css/filament/app/theme.css');
     }
 }
