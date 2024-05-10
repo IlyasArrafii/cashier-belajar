@@ -5,15 +5,19 @@ namespace App\Filament\Resources;
 use App\Enums\OrderStatus;
 use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Filament\Resources\OrderResource\Pages\ViewOrder;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -113,8 +117,10 @@ class OrderResource extends Resource
                             echo $pdf->stream();
                         }, 'receipt-' . $record->order_number . '.pdf');
                     }),
+                ViewAction::make()->color('gray')->visible(fn (Order $order) => ($order->status === OrderStatus::PENDING || $order->status == OrderStatus::COMPLETED || $order->status == OrderStatus::CANCELLED)),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make()
+                    /* View Details Transaction */
+                    EditAction::make()
                         ->color('gray'),
                     /* Edit Transaction Action */
                     Tables\Actions\Action::make('edit-transaction')
@@ -216,7 +222,7 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\OrderResource\RelationManagers\OrderDetailsRelationManager::class,
         ];
     }
 
@@ -226,7 +232,21 @@ class OrderResource extends Resource
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view' => ViewOrder::route('/{record}/details'),
             'create-transaction' => Pages\CreateTransaction::route('{record}'),
         ];
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist->schema([
+            TextEntry::make('order_number')->color('gray'),
+            TextEntry::make('customer.name')->placeholder('-'),
+            TextEntry::make('discount')->money('IDR')->color('gray'),
+            TextEntry::make('total')->money('IDR')->color('gray'),
+            TextEntry::make('payment_method')->badge()->color('gray'),
+            TextEntry::make('status')->badge()->color(fn ($state) => $state->getColor()),
+            TextEntry::make('created_at')->dateTime()->formatStateUsing(fn ($state) => $state->format('d M Y H:i'))->color('gray'),
+        ]);
     }
 }
