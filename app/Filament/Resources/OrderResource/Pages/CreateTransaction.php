@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
@@ -25,34 +26,6 @@ class CreateTransaction extends Page implements HasForms
     public function getTitle(): string
     {
         return "Order: {$this->record->order_number}";
-    }
-
-    protected function getFormSchema(): array
-    {
-        return [
-            Select::make('selectedProduct')
-                ->label('Select Product')
-                ->searchable()
-                ->preload()
-                ->options(Product::pluck('name', 'id')->toArray())
-                ->live()
-                ->afterStateUpdated(function ($state) {
-                    $product = Product::find($state);
-                    $this->record->orderDetails()->updateOrCreate(
-                        [
-                            'order_id' => $this->record->id,
-                            'product_id' => $state,
-                        ],
-                        [
-                            'product_id' => $state,
-                            'quantity' => $this->quantityValue,
-                            'price' => $product->price,
-                            'subtotal' => $product->price * $this->quantityValue,
-                        ]
-                    );
-                    //dd($product);
-                }),
-        ];
     }
 
     //Update Quantity for product
@@ -94,5 +67,32 @@ class CreateTransaction extends Page implements HasForms
     {
         $this->updateOrder();
         $this->redirect('/orders');
+    }
+
+    protected function getFormSchema(): array
+    {
+        return [
+            Select::make('selectedProduct')
+                ->label('Select Product')
+                ->searchable()
+                ->preload()
+                ->options(Product::pluck('name', 'id')->toArray())
+                ->live()
+                ->afterStateUpdated(function ($state) {
+                    $product = Product::find($state);
+                    $this->record->orderDetails()->updateOrCreate(
+                        [
+                            'order_id' => $this->record->id,
+                            'product_id' => $state,
+                        ],
+                        [
+                            'product_id' => $state,
+                            'quantity' => $this->quantityValue,
+                            'price' => $product->price,
+                            'subtotal' => $product->price * $this->quantityValue,
+                        ]
+                    );
+                }),
+        ];
     }
 }

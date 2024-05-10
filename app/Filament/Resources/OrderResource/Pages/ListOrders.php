@@ -31,11 +31,11 @@ class ListOrders extends ListRecords
 
         return $statuses->mapWithKeys(function ($data, $key) {
             $badgeCount = is_null($data['status'])
-            ? Order::count()
+                ? Order::count()
                 : Order::where('status', $data['status'])->count();
 
             return [$key => Tab::make($data['label'])
-            ->badge($badgeCount)
+                ->badge($badgeCount)
                 ->modifyQueryUsing(fn ($query) => is_null($data['status']) ? $query : $query->where('status', $data['status']))
                 ->badgeColor($data['badgeColor'])];
         })->toArray();

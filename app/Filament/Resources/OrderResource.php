@@ -65,6 +65,7 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            /* Columns Get From getTable */
             ->columns(self::getTableColumns())
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -96,7 +97,7 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                //Hidden if status completed
+                /* Print PDF Order Action */
                 Tables\Actions\Action::make('print')
                     ->button()
                     ->color('gray')
@@ -113,26 +114,38 @@ class OrderResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()
                         ->color('gray'),
+                    /* Edit Transaction Action */
                     Tables\Actions\Action::make('edit-transaction')
-                        ->visible(fn (Order $record) => $record->status === \App\Enums\OrderStatus::PENDING)
+                        //Hidden if status completed
+                        ->visible(fn (Order $record) => $record->status === OrderStatus::PENDING)
                         ->hidden(fn (Order $order) => ($order->status == OrderStatus::COMPLETED || $order->status == OrderStatus::CANCELLED))
                         ->label('Edit Transaction')
                         ->icon('heroicon-o-pencil')
                         ->url(fn ($record) => "/orders/{$record->order_number}"),
+                    /* Mark as Complete Action */
                     Tables\Actions\Action::make('mark-as-complete')
-                        ->visible(fn (Order $record) => $record->status === \App\Enums\OrderStatus::PENDING)
+                        ->visible(fn (Order $record) => $record->status === OrderStatus::PENDING)
                         ->hidden(fn (Order $order) => ($order->status == OrderStatus::CANCELLED))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(fn (Order $record) => $record->markAsComplete())
                         ->label('Mark as Complete'),
                     Tables\Actions\Action::make('divider')->label('')->disabled(),
-                    Tables\Actions\DeleteAction::make()->hidden(fn (Order $order) => ($order->status == OrderStatus::COMPLETED || $order->status == OrderStatus::CANCELLED)),
+                    /* Delete Action */
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function (Order $order) {
+                            $order->orderDetails()->delete();
+                            $order->delete();
+                        })->hidden(fn (Order $order) => ($order->status == OrderStatus::COMPLETED || $order->status == OrderStatus::CANCELLED)),
                 ])->color('gray')->hidden(fn (Order $order) => ($order->status == OrderStatus::COMPLETED || $order->status == OrderStatus::CANCELLED)),
             ])
             ->bulkActions([
+                /* Bulk Delete Data Selection Action */
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (\Illuminate\Support\Collection $records) {
+                            $records->each(fn (Order $order) => $order->orderDetails()->delete());
+                        }),
                 ]),
             ])->recordUrl(null);
     }
