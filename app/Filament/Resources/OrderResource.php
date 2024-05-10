@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\OrderStatus;
+use App\Filament\Exports\OrderExporter;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
@@ -12,6 +13,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -147,6 +149,15 @@ class OrderResource extends Resource
                             $records->each(fn (Order $order) => $order->orderDetails()->delete());
                         }),
                 ]),
+            ])
+            ->headerActions([
+                /* Export Data from table to xlsx Action */
+                ExportAction::make()
+                    ->label('Export Excel')
+                    ->fileDisk('public')
+                    ->color('success')
+                    ->icon('heroicon-o-document-text')
+                    ->exporter(OrderExporter::class),
             ])->recordUrl(null);
     }
 
