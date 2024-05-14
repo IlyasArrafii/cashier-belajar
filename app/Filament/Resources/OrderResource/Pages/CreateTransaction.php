@@ -12,6 +12,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Resources\Pages\Page;
 
+use function PHPUnit\Framework\isNull;
+
 class CreateTransaction extends Page implements HasForms
 {
     protected static string $resource = OrderResource::class;
@@ -79,19 +81,22 @@ class CreateTransaction extends Page implements HasForms
                 ->options(Product::pluck('name', 'id')->toArray())
                 ->live()
                 ->afterStateUpdated(function ($state) {
-                    $product = Product::find($state);
-                    $this->record->orderDetails()->updateOrCreate(
-                        [
-                            'order_id' => $this->record->id,
-                            'product_id' => $state,
-                        ],
-                        [
-                            'product_id' => $state,
-                            'quantity' => $this->quantityValue,
-                            'price' => $product->price,
-                            'subtotal' => $product->price * $this->quantityValue,
-                        ]
-                    );
+                    if ($state) {
+                        $product = Product::find($state);
+                        $this->record->orderDetails()->updateOrCreate(
+                            [
+                                'order_id' => $this->record->id,
+                                'product_id' => $state,
+                            ],
+                            [
+                                'product_id' => $state,
+                                'quantity' => $this->quantityValue,
+                                'price' => $product->price,
+                                'subtotal' => $product->price * $this->quantityValue,
+                            ]
+                        );
+                    }
+                    //dd($state);
                 }),
         ];
     }
