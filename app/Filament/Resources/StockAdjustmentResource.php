@@ -9,6 +9,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -25,12 +27,18 @@ class StockAdjustmentResource extends Resource
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Forms\Components\TextInput::make('quantity_adjusted')
                     ->required()
+                    ->placeholder('Please insert a number for the stock adjustment')
                     ->numeric(),
                 Forms\Components\Textarea::make('reason')
                     ->required()
+                    ->default('Restock.')
+                    ->maxLength(65535)
+                    ->placeholder('Write a reason for the stock adjustment')
                     ->columnSpanFull(),
             ]);
     }
@@ -38,28 +46,41 @@ class StockAdjustmentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_adjusted')
+                    ->label('Adjusted')
                     ->numeric()
+                    ->suffix(' Quantity')
+                    ->color('gray')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('product.name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('reason')
+                    ->limit(50)
+                    ->placeholder('-'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('product_id')
+                    ->relationship('product', 'name')
+                    ->searchable()
+                    ->preload()
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])->color('gray')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
