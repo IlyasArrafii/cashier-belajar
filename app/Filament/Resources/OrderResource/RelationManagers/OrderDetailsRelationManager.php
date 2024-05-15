@@ -22,15 +22,15 @@ class OrderDetailsRelationManager extends RelationManager
             ->recordTitleAttribute('order_number')
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
-                ->searchable(),
+                    ->searchable(),
                 TextColumn::make('price')
-                ->label('Harga Satuan')
-                ->numeric()
-                ->prefix(fn (OrderDetail $record) => $record->quantity . ' X ')
-                ->alignEnd(),
+                    ->label('Harga Satuan')
+                    ->numeric()
+                    ->prefix(fn (OrderDetail $record) => $record->quantity . ' X ')
+                    ->alignEnd(),
                 TextColumn::make('subtotal')
-                ->numeric()
-                ->alignEnd()
+                    ->numeric()
+                    ->alignEnd()
             ])
             ->filters([
                 //

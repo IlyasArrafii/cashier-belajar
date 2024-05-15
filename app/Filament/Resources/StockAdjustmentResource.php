@@ -3,7 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StockAdjustmentResource\Pages;
-use App\Filament\Resources\StockAdjustmentResource\RelationManagers;
+//use App\Filament\Resources\StockAdjustmentResource\RelationManagers;
+use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\StockAdjustment;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -29,6 +30,7 @@ class StockAdjustmentResource extends Resource
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
+                    ->hiddenOn(RelationManagers\StockAdjustmentsRelationManager::class)
                     ->required(),
                 Forms\Components\TextInput::make('quantity_adjusted')
                     ->required()
@@ -49,15 +51,15 @@ class StockAdjustmentResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable()
+                    ->hiddenOn(RelationManagers\StockAdjustmentsRelationManager::class),
                 Tables\Columns\TextColumn::make('quantity_adjusted')
                     ->label('Adjusted')
                     ->numeric()
                     ->suffix(' Quantity')
                     ->color('gray')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('product.name')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('reason')
                     ->limit(50)
                     ->placeholder('-'),
@@ -75,6 +77,7 @@ class StockAdjustmentResource extends Resource
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
+                    ->hiddenOn(RelationManagers\StockAdjustmentsRelationManager::class)
             ])
             ->actions([
                 ActionGroup::make([

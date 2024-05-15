@@ -132,10 +132,6 @@ class ProductResource extends Resource
                     Tables\Actions\DeleteBulkAction::make()
                         ->after(function (Product $record) {
                             if ($record->image) {
-                                Storage::disk('public')->delete($record->image);
-                            }
-
-                            if ($record->image) {
                                 foreach ($record->image as $ph) Storage::disk('public')->delete($ph);
                             }
                         }),
@@ -146,7 +142,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\StockAdjustmentsRelationManager::class,
         ];
     }
 
