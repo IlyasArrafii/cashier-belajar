@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Customer::factory(50)->create();
-        Product::factory(50)->create();
-        StockAdjustment::factory(50)->create();
-        Order::factory(50)->create();
+        //Product::factory(50)->create();
+        //StockAdjustment::factory(50)->create();
+        //Order::factory(50)->create();
     }
 }
