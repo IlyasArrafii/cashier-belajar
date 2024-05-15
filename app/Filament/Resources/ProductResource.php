@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
+use App\Traits\HasNavigationBadge;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\FileUpload;
@@ -22,9 +23,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductResource extends Resource
 {
-    protected static ?string $model = Product::class;
+    use HasNavigationBadge;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $model = Product::class;
+    protected static ?string $navigationGroup = 'Stock';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     public static function form(Form $form): Form
     {
@@ -153,5 +156,11 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    /* Badge For Count Data */
+    public static function getNavigationBadge(): ?string
+    {
+        return static::$model::count();
     }
 }
