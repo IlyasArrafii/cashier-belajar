@@ -48,11 +48,13 @@ class AppPanelProvider extends PanelProvider
             ->authMiddleware([Authenticate::class,])
             ->sidebarCollapsibleOnDesktop()
             ->brandName('Cashier Belajar')
-            ->darkMode(condition: true, isForced: true)
             ->navigationGroups([
                 'Transactions',
                 'Stock'
             ])
-            ->viteTheme('resources/css/filament/app/theme.css');
+            ->viteTheme('resources/css/filament/app/theme.css')
+            ->plugins([
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
+            ]);
     }
 }

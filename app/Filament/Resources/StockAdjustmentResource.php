@@ -6,6 +6,7 @@ use App\Filament\Resources\StockAdjustmentResource\Pages;
 //use App\Filament\Resources\StockAdjustmentResource\RelationManagers;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\StockAdjustment;
+use App\Traits\HasNavigationBadge;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,6 +19,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StockAdjustmentResource extends Resource
 {
+    use HasNavigationBadge;
+
     protected static ?string $model = StockAdjustment::class;
     protected static ?string $navigationGroup = 'Stock';
     protected static ?string $navigationIcon = 'heroicon-o-folder';
