@@ -6,11 +6,14 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions;
+use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOrders extends ListRecords
 {
+    use ExposesTableToWidgets;
+
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
@@ -39,5 +42,12 @@ class ListOrders extends ListRecords
                 ->modifyQueryUsing(fn ($query) => is_null($data['status']) ? $query : $query->where('status', $data['status']))
                 ->badgeColor($data['badgeColor'])];
         })->toArray();
+    }
+
+    public function getHeaderWidgets(): array
+    {
+        return [
+            OrderResource\Widgets\OrderStats::class,
+        ];
     }
 }

@@ -8,6 +8,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\Pages\ViewOrder;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Traits\HasNavigationBadge;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Closure;
 use Filament\Forms;
@@ -25,6 +26,8 @@ use Illuminate\Validation\Rules\Enum;
 
 class OrderResource extends Resource
 {
+    use HasNavigationBadge;
+
     protected static ?string $model = Order::class;
     protected static ?string $navigationGroup = 'Transactions';
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
@@ -248,5 +251,12 @@ class OrderResource extends Resource
             TextEntry::make('status')->badge()->color(fn ($state) => $state->getColor()),
             TextEntry::make('created_at')->dateTime()->formatStateUsing(fn ($state) => $state->format('d M Y H:i'))->color('gray'),
         ]);
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            OrderResource\Widgets\OrderStats::class,
+        ];
     }
 }
