@@ -203,7 +203,6 @@ class OrderResource extends Resource
             Tables\Columns\TextColumn::make('status')
                 ->badge()
                 ->color(fn ($state) => $state->getColor()),
-
             Tables\Columns\TextColumn::make('user.name')
                 ->numeric()
                 ->toggleable(isToggledHiddenByDefault: true),

@@ -11,7 +11,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -34,15 +36,25 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
+                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\TextInput::make('password')
+                    ->password()
+                    ->dehydrateStateUsing(fn ($state) => bcrypt($state))
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn (string $context): bool => $context === 'create')
+                    ->minLength(8)
+                    ->live(1000)
+                    ->revealable()
+                    ->same('passwordConfirmation'),
+                Forms\Components\TextInput::make('passwordConfirmation')
+                    ->password()
+                    ->dehydrated(false)
+                    ->revealable()
+                    ->hidden(fn (Forms\Get $get) => $get('password') == null),
                 Select::make('Roles')
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->preload(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
             ]);
     }
 
@@ -50,26 +62,34 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar')
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                    ->description(fn ($record) => $record->email)
                     ->searchable(),
                 TextColumn::make('roles.name')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => str($state)->title()->replace('_', ' ')),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ? $state->format('D d M, Y') : '-'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ? $state->format('D d M, Y') : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ? $state->format('D d M, Y') : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

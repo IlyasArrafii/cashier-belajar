@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use Awcodes\FilamentGravatar\GravatarPlugin;
+use Awcodes\FilamentGravatar\GravatarProvider;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -31,7 +34,7 @@ class AppPanelProvider extends PanelProvider
             ->colors(['primary' => Color::Blue,])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([Pages\Dashboard::class,])
+            ->pages([\App\Filament\Pages\Dashboard::class,])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([Widgets\AccountWidget::class, Widgets\FilamentInfoWidget::class,])
             ->middleware([
@@ -53,8 +56,13 @@ class AppPanelProvider extends PanelProvider
                 'Stock'
             ])
             ->viteTheme('resources/css/filament/app/theme.css')
+            ->defaultAvatarProvider(GravatarProvider::class)
+            ->simpleProfilePage()
             ->plugins([
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
+                FilamentShieldPlugin::make(),
+                GravatarPlugin::make()
+                    ->size(200)
+                    ->rating('pg'),
             ]);
     }
 }

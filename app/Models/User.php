@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
@@ -54,5 +55,14 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=200&d=mp&r=pg';
+            }
+        );
     }
 }

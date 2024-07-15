@@ -20,13 +20,17 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
+            ShieldSeeder::class,
             UserSeeder::class,
             CategorySeeder::class,
         ]);
 
         Customer::factory(50)->create();
-        //Product::factory(50)->create();
-        //StockAdjustment::factory(50)->create();
-        //Order::factory(50)->create();
+        Product::factory(50)->create();
+        StockAdjustment::factory(50)->create();
+
+        $this->call([OrderSeeder::class]);
+
+        \Laravel\Prompts\info('Seeding completed!');
     }
 }
