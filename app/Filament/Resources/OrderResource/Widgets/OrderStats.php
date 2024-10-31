@@ -40,7 +40,7 @@ class OrderStats extends BaseWidget
 
         return [
             Stat::make('Orders', $this->getPageTableQuery()->count())
-                ->chart($count->map(fn (TrendValue $item) => $item->aggregate)->toArray())
+                ->chart($count->map(fn(TrendValue $item) => $item->aggregate)->toArray())
                 ->icon('heroicon-o-shopping-bag')
                 ->description('Orders this month so far.')
                 ->descriptionColor('gray')
@@ -53,7 +53,7 @@ class OrderStats extends BaseWidget
                         ->where('status', OrderStatus::COMPLETED)
                         ->when(
                             $this->tableFilters['created_at']['created_from'] && $this->tableFilters['created_at']['created_until'],
-                            fn ($query) => $query->whereDate('created_at', '>=', $createdFrom)->whereDate('created_at', '<=', $createdTo)
+                            fn($query) => $query->whereDate('created_at', '>=', $createdFrom)->whereDate('created_at', '<=', $createdTo)
                         )
                         ->sum('total'),
                     0,
@@ -61,7 +61,7 @@ class OrderStats extends BaseWidget
                     '.'
                 )
             )
-                ->chart($total->map(fn (TrendValue $item) => $item->aggregate)->toArray())
+                ->chart($total->map(fn(TrendValue $item) => $item->aggregate)->toArray())
                 ->icon('heroicon-o-banknotes')
                 ->description('Profit this month so far.')
                 ->descriptionColor('gray')
@@ -74,7 +74,7 @@ class OrderStats extends BaseWidget
                         ->where('status', OrderStatus::COMPLETED)
                         ->when(
                             $this->tableFilters['created_at']['created_from'] && $this->tableFilters['created_at']['created_until'],
-                            fn ($query) => $query->whereDate('created_at', '>=', $createdFrom)->whereDate('created_at', '<=', $createdTo)
+                            fn($query) => $query->whereDate('created_at', '<=', $createdFrom)->whereDate('created_at', '<=', $createdTo)
                         )
                         ->sum('profit'),
                     0,
@@ -82,7 +82,7 @@ class OrderStats extends BaseWidget
                     '.'
                 )
             )
-                ->chart($profit->map(fn (TrendValue $item) => $item->aggregate)->toArray())
+                ->chart($profit->map(fn(TrendValue $item) => $item->aggregate)->toArray())
                 ->icon('heroicon-o-banknotes')
                 ->description('Profit this month so far.')
                 ->descriptionColor('gray')

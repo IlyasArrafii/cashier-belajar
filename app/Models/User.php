@@ -10,9 +10,11 @@ use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
+use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -22,6 +24,7 @@ class User extends Authenticatable implements FilamentUser
     use Notifiable;
     use HasRoles;
     use HasPanelShield;
+    use AuthenticationLoggable;
 
     /**
      * The attributes that are mass assignable.
@@ -64,5 +67,10 @@ class User extends Authenticatable implements FilamentUser
                 return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=200&d=mp&r=pg';
             }
         );
+    }
+
+    public function authenticationLog(): HasMany
+    {
+        return $this->hasMany(AuthenticationLog::class);
     }
 }

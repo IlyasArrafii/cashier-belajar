@@ -22,19 +22,18 @@ class Dashboard extends BaseDashboard
                 Section::make()
                     ->schema([
                         Select::make('customer')
-                            ->options(fn () => \App\Models\Customer::pluck('name', 'id')->toArray())
+                            ->options(fn() => \App\Models\Customer::pluck('name', 'id')->toArray())
                             ->placeholder('All customers')
                             ->searchable()
                             ->preload(),
                         DatePicker::make('start_date')
-                            ->native(false)
-                            ->maxDate(fn (Get $get) => $get('end_date') ?: now()),
+                            ->maxDate(fn(Get $get) => $get('end_date') ?: now()),
                         DatePicker::make('end_date')
-                            ->minDate(fn (Get $get) => $get('start_date') ?: now())
-                            ->native(false)
+                            ->minDate(fn(Get $get) => $get('start_date') ?: now())
                             ->maxDate(now()),
                     ])
-                    ->columns(3),
+                    ->columns(3)
+                    ->visible(auth()->user()->hasRole(['super_admin', 'manager'])),
             ]);
     }
 }

@@ -19,6 +19,11 @@ class ProfitChart extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return auth()->user()->hasRole(['super_admin', 'manager']);
+    }
+
     protected function getData(): array
     {
         $createdFrom = new Carbon($this->filters['start_date'] ?? now()->startOfMonth());
